@@ -18,8 +18,8 @@ player.typ='dyna'--typ='dyna' means it is a dynamic object and can move
 world:body(0,0,80,80,player)
 ground=world:body(0,400,800,100,{typ='anch',tag='ground'})--typ='anch' means the object is anchored and cannot move
 
-boxy=world:body(400,310,100,90,{color={1,0,0}},tag='boxy')--by default, typ='anch'
-dynamicboxy=world:body(200,0,80,80,{typ='dyna',yvol=0,tag='dynaboxy'})
+boxy=world:body(400,310,100,90,{color={1,0,0},tag='boxy'})--by default, typ='anch'
+dynaboxy=world:body(200,0,80,80,{typ='dyna',yvol=0,tag='dynaboxy'})
 
 
 

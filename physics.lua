@@ -212,13 +212,14 @@ function world:update(dt)
 					ynormal=ynormal,
 					a=a,
 					b=b,
-					--axvol=a.xvol,bxvol=b.xvol,--collisions less squishy without this but works either way
+					--axvol=a.xvol,bxvol=b.xvol,--collisions less squishy without this
 					--ayvol=a.yvol,byvol=b.yvol,
 					side=side,
 				}
 				if depth>0 and (a.typ=='dyna' or b.typ=='dyna') then
 					local wastouching=self.touching[a][b]
 					self.touching[a][b]=coll
+					self.touching[b][a]=coll
 					if not wastouching then
 						docallbacks(self.touchbegin,a,b,side,coll)
 					end
@@ -229,6 +230,7 @@ function world:update(dt)
 				else
 					local wastouching=self.touching[a][b]
 					self.touching[a][b]=false
+					self.touching[b][a]=false
 					if wastouching then
 						docallbacks(self.touchend,a,b,side,wastouching)
 					end
