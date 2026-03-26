@@ -2,7 +2,6 @@
 local defaults={
 	bounciness=0,
 	friction=0.03,
-	density=1,
 	typ='anch',
 	gravscale=1,
 	frictionscale=1,
