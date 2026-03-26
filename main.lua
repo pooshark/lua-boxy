@@ -18,9 +18,8 @@ player.typ='dyna'--typ='dyna' means it is a dynamic object and can move
 world:body(0,0,80,80,player)
 ground=world:body(0,400,800,100,{typ='anch',tag='ground'})--typ='anch' means the object is anchored and cannot move
 
-boxy=world:body(400,310,100,90,{tag='boxy',color={1,0,0}})--by default, typ='anch'
---world:body(0,0,800,150,{tag='ceiling'})
-dynamicboxy=world:body(200,0,80,80,{typ='dyna',yvol=0,tag='dynaboxy'})--btw if you set the yvol to -10 it will go above the ceiling (it spawns in the ceiling)
+boxy=world:body(400,310,100,90,{color={1,0,0}},tag='boxy')--by default, typ='anch'
+dynamicboxy=world:body(200,0,80,80,{typ='dyna',yvol=0,tag='dynaboxy'})
 
 
 
@@ -29,7 +28,7 @@ world.touchbegin={
     ['player']={--this is what the 'tag' option is for
         --the '_any' tag matches any object
         ['_any']=function(A,B,side,coll)
-            --callbacks are one-way, so A.tag=='player', B==anything
+            --callback tags match one-way, so A.tag=='player', B==anything
             --A is the player table we made before
             if side=='bottom' then
                 --side is relative to A (when the bottom of A is touching B)
@@ -62,20 +61,19 @@ world.touchend['player']={
         end
     end
 }
---note that touchbegin, touchend, and presolve are all called before the collision is resolved
+--note that touchbegin, touchend, and presolve are all called before the collision is resolved, while postsolve is called after
 --presolve and postsolve callbacks are called every frame that two objects are touching
-world.postsolve['_any']={
-    ['_any']=function(a,b,side)
+world.presolve['_any']={
+    ['_any']=function(a,b,side,coll)
         --both _any's can match either object in the collision, 
         -- so this callback would fire twice per touching pair of objects
         -- a and b would be switched on the second callback call
         --the same thing can happen whenever the two tags can match either object
     end,
 }
---other special tags are '_none'(the default tag), and 
---  '_notnone', which matches any tag except '_none'
 --removing a callback:
-world.postsolve['_any']['_any']=nil
+world.presolve['_any']['_any']=nil
+
 world.postsolve.player={--yeah you don't need the [''] obv
     _any=function(a,b,side,coll)
         if player.justgrounded then
@@ -90,16 +88,10 @@ world.postsolve.player={--yeah you don't need the [''] obv
     ground=function(a,b,side,coll)
         --print(coll.xnormal,coll.ynormal)
     end
-    
+    --note that objects may or may not be still overlapping after collision resolution
 }
-world.presolve.player={--yeah you don't need the [''] syntax
-    _any=function(a,b,side,coll)
-        print(a.xvol,b.xvol)
-    end,
-}
-world.presolve.player=nil
---also note that callbacks fire after the collision is resolved, 
--- so they may OR may not still be overlapping
+--other special tags are '_none'(the default tag), and 
+--  '_notnone', which matches any tag except '_none'
 function love.load()
 end
 function love.keypressed(key,scancode)
@@ -132,6 +124,7 @@ function love.update(dt)
         player.yvol=-400
         player.jumped=true
     end
+    print(world.touching[player][dynaboxy])--prints a collision table if they are touching, otherwise nil (and yes world.touching is indexed with the body tables themselves)
     lastspace=space
     world:update(dt)
     player.jumped=false
